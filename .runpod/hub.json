@@ -10,7 +10,7 @@
     "gpuIds": "ADA_80_PRO, AMPERE_80",
     "gpuCount": 1,
     "allowedCudaVersions": [
-      "12.8",
+      "12.8"
     ],
     "presets": [
       {
