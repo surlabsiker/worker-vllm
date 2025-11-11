@@ -1,38 +1,25 @@
 FROM nvidia/cuda:12.8.1-base-ubuntu24.04
 
-RUN apt-get update -y \
-    && apt-get install -y python3-pip
+ENV DEBIAN_FRONTEND=noninteractive
 
-RUN ldconfig /usr/local/cuda-12.8.1/compat/
-
-# Install Python dependencies
-COPY builder/requirements.txt /requirements.txt
-
-# Ensure Python 3.12 and venv are available and usable
 RUN apt-get update -y && \
     apt-get install -y software-properties-common && \
     add-apt-repository universe && \
     apt-get update -y && \
-    DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        python3 \
-        python3-venv \
-        python3-pip \
-        curl && \
+    apt-get install -y python3 python3-venv python3-pip curl && \
+    ldconfig /usr/local/cuda-12.8.1/compat/ && \
+    python3 -m venv /opt/venv && \
     rm -rf /var/lib/apt/lists/*
 
-# Create isolated virtual environment (avoid PEP 668)
-RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install dependencies safely inside venv
+COPY builder/requirements.txt /tmp/requirements.txt
+
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
-    pip install -r /requirements.txt
-
-# Install vLLM (switching back to pip installs since issues that required building fork are fixed and space optimization is not as important since caching) and FlashInfer 
-RUN python3 -m pip install vllm==0.11.0
-RUN python3 -m pip install flashinfer-python flashinfer-cubin
-RUN python3 -m pip install flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu128
+    pip install -r /tmp/requirements.txt && \
+    pip install vllm==0.11.0 flashinfer-python flashinfer-cubin && \
+    pip install flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu128
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
@@ -54,7 +41,6 @@ ENV MODEL_NAME=$MODEL_NAME \
     HF_HUB_ENABLE_HF_TRANSFER=0 
 
 ENV PYTHONPATH="/:/vllm-workspace"
-
 
 COPY src /src
 RUN --mount=type=secret,id=HF_TOKEN,required=false \
