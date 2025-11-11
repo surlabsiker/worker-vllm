@@ -7,21 +7,23 @@ RUN ldconfig /usr/local/cuda-12.8.1/compat/
 
 # Install Python dependencies
 COPY builder/requirements.txt /requirements.txt
+
+# Ensure Python 3.12 and venv are available and usable
 RUN apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
-        python3.12 \
-        python3.12-venv \
-        python3.12-distutils \
-        python3.12-full \
+        python3 \
+        python3-venv \
         python3-pip \
+        python3-distutils \
+        python3-dev \
         curl && \
-    ln -sf /usr/bin/python3.12 /usr/bin/python3
+    rm -rf /var/lib/apt/lists/*
 
-# Create isolated venv so we avoid PEP 668 restrictions
+# Create isolated virtual environment (avoid PEP 668)
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
-# Install dependencies inside the venv
+# Install dependencies safely inside venv
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install -r /requirements.txt
