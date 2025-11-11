@@ -10,6 +10,9 @@ COPY builder/requirements.txt /requirements.txt
 
 # Ensure Python 3.12 and venv are available and usable
 RUN apt-get update -y && \
+    apt-get install -y software-properties-common && \
+    add-apt-repository universe && \
+    apt-get update -y && \
     DEBIAN_FRONTEND=noninteractive apt-get install -y \
         python3 \
         python3-venv \
