@@ -31,6 +31,8 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Install vLLM (switching back to pip installs since issues that required building fork are fixed and space optimization is not as important since caching) and FlashInfer 
 RUN python3 -m pip install vllm==0.11.0
+RUN python3 -m pip install flashinfer-python flashinfer-cubin
+RUN python3 -m pip install flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu128
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
