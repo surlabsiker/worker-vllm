@@ -7,12 +7,27 @@ RUN ldconfig /usr/local/cuda-12.8.1/compat/
 
 # Install Python dependencies
 COPY builder/requirements.txt /requirements.txt
+RUN apt-get update -y && \
+    DEBIAN_FRONTEND=noninteractive apt-get install -y \
+        python3.12 \
+        python3.12-venv \
+        python3.12-distutils \
+        python3.12-full \
+        python3-pip \
+        curl && \
+    ln -sf /usr/bin/python3.12 /usr/bin/python3
+
+# Create isolated venv so we avoid PEP 668 restrictions
+RUN python3 -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Install dependencies inside the venv
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python3 -m pip install --upgrade pip --break-system-packages && \
-    python3 -m pip install --upgrade -r /requirements.txt --break-system-packages
+    pip install --upgrade pip && \
+    pip install -r /requirements.txt
 
 # Install vLLM (switching back to pip installs since issues that required building fork are fixed and space optimization is not as important since caching) and FlashInfer 
-RUN python3 -m pip install vllm==0.11.0 --break-system-packages
+RUN python3 -m pip install vllm==0.11.0
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
