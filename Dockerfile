@@ -17,8 +17,6 @@ RUN apt-get update -y && \
         python3 \
         python3-venv \
         python3-pip \
-        python3-distutils \
-        python3-dev \
         curl && \
     rm -rf /var/lib/apt/lists/*
 
