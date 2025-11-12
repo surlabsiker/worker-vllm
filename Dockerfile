@@ -19,8 +19,7 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
     pip install vllm==0.11.0 && \
-    pip install flashinfer-python flashinfer-cubin # && \
-    # pip install flashinfer-jit-cache --index-url https://flashinfer.ai/whl/cu128
+    pip install flashinfer-python flashinfer-cubin
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
