@@ -18,8 +18,7 @@ COPY builder/requirements.txt /tmp/requirements.txt
 RUN --mount=type=cache,target=/root/.cache/pip \
     pip install --upgrade pip && \
     pip install -r /tmp/requirements.txt && \
-    pip install vllm==0.11.0 && \
-    pip install flashinfer-python
+    pip install vllm==0.13.0
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
