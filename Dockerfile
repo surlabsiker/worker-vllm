@@ -1,7 +1,7 @@
 FROM vllm/vllm-openai:v0.13.0
 
 # Install runpod SDK
-RUN pip install runpod>=1.8,<2.0 python-dotenv
+RUN pip install "runpod>=1.8,<2.0" python-dotenv
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
