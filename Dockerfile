@@ -1,25 +1,7 @@
-FROM nvidia/cuda:12.8.1-runtime-ubuntu24.04
+FROM vllm/vllm-openai:v0.13.0
 
-ENV DEBIAN_FRONTEND=noninteractive \
-    PYTHONUNBUFFERED=1
-
-RUN apt-get update -y && \
-    apt-get install -y software-properties-common && \
-    add-apt-repository universe && \
-    apt-get update -y && \
-    apt-get install -y python3 python3-venv python3-pip curl && \
-    ldconfig /usr/local/cuda-12.8.1/compat/ && \
-    python3 -m venv /opt/venv && \
-    rm -rf /var/lib/apt/lists/*
-
-ENV PATH="/opt/venv/bin:$PATH"
-
-COPY builder/requirements.txt /tmp/requirements.txt
-
-RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --upgrade pip && \
-    pip install -r /tmp/requirements.txt && \
-    pip install vllm==0.13.0
+# Install runpod SDK
+RUN pip install runpod>=1.8,<2.0 python-dotenv
 
 # Setup for Option 2: Building the Image with the Model included
 ARG MODEL_NAME=""
@@ -38,11 +20,12 @@ ENV MODEL_NAME=$MODEL_NAME \
     HF_DATASETS_CACHE="${BASE_PATH}/huggingface-cache/datasets" \
     HUGGINGFACE_HUB_CACHE="${BASE_PATH}/huggingface-cache/hub" \
     HF_HOME="${BASE_PATH}/huggingface-cache/hub" \
-    HF_HUB_ENABLE_HF_TRANSFER=0 
+    HF_HUB_ENABLE_HF_TRANSFER=0
 
 ENV PYTHONPATH="/:/vllm-workspace"
 
 COPY src /src
+
 RUN --mount=type=secret,id=HF_TOKEN,required=false \
     if [ -f /run/secrets/HF_TOKEN ]; then \
     export HF_TOKEN=$(cat /run/secrets/HF_TOKEN); \
