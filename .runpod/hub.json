@@ -7,11 +7,9 @@
   "config": {
     "runsOn": "GPU",
     "containerDiskInGb": 150,
-    "gpuIds": "ADA_80_PRO, AMPERE_80",
+    "gpuIds": "ADA_80_PRO,AMPERE_80",
     "gpuCount": 1,
-    "allowedCudaVersions": [
-      "12.8"
-    ],
+    "allowedCudaVersions": ["12.9"],
     "presets": [
       {
         "name": "deepseek-ai/deepseek-r1-distill-llama-8b",
@@ -928,6 +926,16 @@
           "type": "number",
           "description": "Max concurrent requests per worker. vLLM has an internal queue, so you don't have to worry about limiting by VRAM, this is for improving scaling/load balancing efficiency",
           "default": 30,
+          "advanced": true
+        }
+      },
+      {
+        "key": "ENABLE_EXPERT_PARALLEL",
+        "input": {
+          "name": "Enable Expert Parallel",
+          "type": "boolean",
+          "description": "Enable Expert Parallel for MoE models",
+          "default": false,
           "advanced": true
         }
       },
